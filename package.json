@@ -17,10 +17,11 @@
   "dependencies": {
     "copy-to-clipboard": "3.3.1",
     "lodash": "4.17.21",
+    "parcel": "2.5.0",
     "react": "18.1.0",
     "react-dom": "18.1.0",
     "react-hook-form": "7.31.1",
-    "title-case": "3.0.3",
-    "parcel": "2.5.0"
+    "serve": "13.0.2",
+    "title-case": "3.0.3"
   }
 }
