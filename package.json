@@ -1,0 +1,21 @@
+{
+  "name": "meal-plan",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Eric Biewener <eric.biewener0@walmart.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "parcel public/index.html"
+  },
+  "devDependencies": {
+    "@types/lodash": "4.14.182",
+    "parcel": "2.5.0"
+  },
+  "dependencies": {
+    "lodash": "4.17.21",
+    "react": "18.1.0",
+    "react-dom": "18.1.0",
+    "react-hook-form": "7.31.1",
+    "title-case": "3.0.3"
+  }
+}
