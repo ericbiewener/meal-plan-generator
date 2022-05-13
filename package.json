@@ -5,15 +5,14 @@
   "license": "MIT",
   "scripts": {
     "start": "parcel public/index.html",
-    "build": "parcel build public/index.html",
     "start:production": "serve dist",
+    "build": "parcel build public/index.html",
     "deploy": "git push heroku main"
   },
   "devDependencies": {
     "@types/lodash": "4.14.182",
     "@types/react": "18.0.9",
-    "@types/react-dom": "18.0.4",
-    "parcel": "2.5.0"
+    "@types/react-dom": "18.0.4"
   },
   "dependencies": {
     "copy-to-clipboard": "3.3.1",
@@ -21,6 +20,7 @@
     "react": "18.1.0",
     "react-dom": "18.1.0",
     "react-hook-form": "7.31.1",
-    "title-case": "3.0.3"
+    "title-case": "3.0.3",
+    "parcel": "2.5.0"
   }
 }
