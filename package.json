@@ -6,7 +6,7 @@
   "scripts": {
     "start": "parcel public/index.html",
     "build": "parcel build public/index.html",
-    "start:production": "echo hello && yarn install && yarn build && serve dist",
+    "start:production": "serve dist",
     "deploy": "git push heroku main"
   },
   "devDependencies": {
