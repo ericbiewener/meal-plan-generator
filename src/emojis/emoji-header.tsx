@@ -1,11 +1,14 @@
 import _ from "lodash";
-import { getEmojis } from "./get-emojis";
+import { emojis } from "./emojis";
+import { FC, useMemo } from "react";
 
-export const EmojiHeader = () => {
-  const emojis = _.shuffle(getEmojis());
+type Props = { reRenderCount?: unknown };
+
+export const EmojiHeader: FC<Props> = ({ reRenderCount }) => {
+  const shuffledEmojis = useMemo(() => _.shuffle(emojis), [reRenderCount]);
   return (
     <div className="emoji-header">
-      {emojis.slice(0, 5).map((e) => (
+      {shuffledEmojis.slice(0, 5).map((e) => (
         <span key={e}>{e}</span>
       ))}
     </div>

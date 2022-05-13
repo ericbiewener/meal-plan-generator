@@ -1,48 +1,96 @@
 import { useForm } from "react-hook-form";
 import _ from "lodash";
 import { titleCase } from "title-case";
-import { getFoodsByType, FoodWithName } from "./foods";
+import { getFoodsByType, Food } from "./foods";
 import { EmojiHeader } from "./emojis/emoji-header";
-import { useState, SyntheticEvent } from "react";
+import { useState, SyntheticEvent, useEffect, useMemo } from "react";
+import copy from "copy-to-clipboard";
 
 type Meal = {
-  protein: FoodWithName;
-  carb?: FoodWithName;
-  veggie?: FoodWithName;
+  protein: Food;
+  carb?: Food;
+  veggie?: Food;
 };
 
-const preventDefault = (e: SyntheticEvent) => e.preventDefault()
+const preventDefault = (e: SyntheticEvent) => e.preventDefault();
 
-const createMeals = (quantity: number) => {
-  const meals: Meal[] = [];
+const createMeals = (quantity: number, pinnedMeals: Meal[]) => {
+  const meals = [...pinnedMeals];
+  const remaining = quantity - meals.length;
+
   const foods = getFoodsByType();
-  const proteins = _.shuffle(foods.proteins);
+  const proteins = _.shuffle(foods.proteins).filter(
+    (p) => !meals.some((m) => m.protein.name === p.name)
+  );
   const carbs = _.shuffle(foods.carbs);
   const veggies = _.shuffle(foods.veggies);
 
-  for (let i = 0; i < quantity; i++) {
+  for (let i = 0; i < remaining; i++) {
     const protein = proteins.pop();
     if (!protein) break;
 
     const meal: Meal = { protein };
-    if (!protein.carb) meal.carb = carbs.pop();
-    if (!protein.veggie) meal.veggie = veggies.pop();
+    if (protein.sides) {
+      protein.sides.forEach((side) => {
+        if (side.veggie) {
+          meal.veggie = side;
+        } else if (side.carb) {
+          meal.carb = side;
+        }
+      });
+    }
+
+    if (!meal.carb && !meal.veggie?.carb && !protein.carb)
+      meal.carb = carbs.pop();
+    if (!meal.veggie && !meal.carb?.veggie && !protein.veggie)
+      meal.veggie = veggies.pop();
     meals.push(meal);
   }
 
   return meals;
 };
 
+const usePinned = () => {
+  const [pinned, setPinned] = useState<Meal[]>([]);
+
+  const togglePin = (meal: Meal) => {
+    const idx = pinned.indexOf(meal);
+    if (idx < 0) {
+      setPinned([...pinned, meal]);
+    } else {
+      setPinned([...pinned.slice(0, idx), ...pinned.slice(idx)]);
+    }
+  };
+
+  return { pinned, togglePin };
+};
+
+const copyMeals = (meals: Meal[]) => () => {
+  copy(
+    meals
+      .map((m) =>
+        [m.protein.name, m.veggie?.name, m.carb?.name]
+          .filter(Boolean)
+          .join(", ")
+      )
+      .join("\n")
+  );
+};
+
 export const SelectionForm = () => {
-  const [_, reRender] = useState(0);
+  const [reRenderCount, reRender] = useState(0);
   const { register, watch } = useForm({ defaultValues: { days: 10 } });
 
   const days = watch("days");
-  const meals = createMeals(Number(days));
+  const { pinned, togglePin } = usePinned();
+  const meals = useMemo(
+    () => createMeals(days, pinned),
+    [days, reRenderCount, pinned]
+  );
 
   return (
     <>
-      <EmojiHeader />
+      <EmojiHeader reRenderCount={`${reRenderCount}${days}`} />
       <form id="settings" onSubmit={preventDefault}>
         <div>
           <input
@@ -65,9 +113,13 @@ export const SelectionForm = () => {
             <th>Veggie</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody style={{ cursor: "pointer" }}>
           {meals.map((meal) => (
-            <tr key={meal.protein.name}>
+            <tr
+              key={meal.protein.name}
+              onClick={() => togglePin(meal)}
+              className={pinned.includes(meal) ? "pinned" : undefined}
+            >
               <td>{titleCase(meal.protein.name)}</td>
               <td>{meal.carb && titleCase(meal.carb.name)}</td>
               <td>{meal.veggie && titleCase(meal.veggie.name)}</td>
@@ -75,6 +127,11 @@ export const SelectionForm = () => {
           ))}
         </tbody>
       </table>
+      <div className="text-center">
+        <button className="copy-results" onClick={copyMeals(meals)}>
+          Copy results
+        </button>
+      </div>
     </>
   );
 };

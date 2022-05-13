@@ -1008,18 +1008,78 @@ try {
 var _jsxDevRuntime = require("react/jsx-dev-runtime");
 var _selectionForm = require("./selection-form");
 var _client = require("react-dom/client");
-const App = ()=>{
-    return /*#__PURE__*/ _jsxDevRuntime.jsxDEV(_selectionForm.SelectionForm, {}, void 0, false, {
-        fileName: "src/app.tsx",
-        lineNumber: 5,
-        columnNumber: 10
-    }, undefined);
+var _foodList = require("./food-list");
+var _react = require("react");
+var _s = $RefreshSig$();
+const getScreen = (screen)=>{
+    switch(screen){
+        case "foodList":
+            return /*#__PURE__*/ _jsxDevRuntime.jsxDEV(_foodList.FoodList, {}, void 0, false, {
+                fileName: "src/app.tsx",
+                lineNumber: 11,
+                columnNumber: 14
+            }, undefined);
+        default:
+            return null;
+    }
 };
+const App = ()=>{
+    _s();
+    const [screen, setScreen] = _react.useState("generator");
+    const visibleScreen = getScreen(screen);
+    return /*#__PURE__*/ _jsxDevRuntime.jsxDEV(_jsxDevRuntime.Fragment, {
+        children: [
+            /*#__PURE__*/ _jsxDevRuntime.jsxDEV("div", {
+                id: "main-menu",
+                children: [
+                    /*#__PURE__*/ _jsxDevRuntime.jsxDEV("button", {
+                        onClick: ()=>setScreen("generator")
+                        ,
+                        children: "Meal Generator"
+                    }, void 0, false, {
+                        fileName: "src/app.tsx",
+                        lineNumber: 25,
+                        columnNumber: 9
+                    }, undefined),
+                    /*#__PURE__*/ _jsxDevRuntime.jsxDEV("button", {
+                        onClick: ()=>setScreen("foodList")
+                        ,
+                        children: "Food List"
+                    }, void 0, false, {
+                        fileName: "src/app.tsx",
+                        lineNumber: 26,
+                        columnNumber: 9
+                    }, undefined)
+                ]
+            }, void 0, true, {
+                fileName: "src/app.tsx",
+                lineNumber: 24,
+                columnNumber: 7
+            }, undefined),
+            /*#__PURE__*/ _jsxDevRuntime.jsxDEV("div", {
+                style: {
+                    display: visibleScreen ? "none" : "block"
+                },
+                children: /*#__PURE__*/ _jsxDevRuntime.jsxDEV(_selectionForm.SelectionForm, {}, void 0, false, {
+                    fileName: "src/app.tsx",
+                    lineNumber: 29,
+                    columnNumber: 66
+                }, undefined)
+            }, void 0, false, {
+                fileName: "src/app.tsx",
+                lineNumber: 29,
+                columnNumber: 7
+            }, undefined),
+            visibleScreen
+        ]
+    }, void 0, true);
+};
+_s(App, "XqsKDjXFs+Y5ixWpuaGjk6hwBRE=");
 _c = App;
 const root = _client.createRoot(document.getElementById("react-root"));
 root.render(/*#__PURE__*/ _jsxDevRuntime.jsxDEV(App, {}, void 0, false, {
     fileName: "src/app.tsx",
-    lineNumber: 9,
+    lineNumber: 36,
     columnNumber: 13
 }, undefined));
 var _c;
@@ -1030,7 +1090,7 @@ $RefreshReg$(_c, "App");
   window.$RefreshReg$ = prevRefreshReg;
   window.$RefreshSig$ = prevRefreshSig;
 }
-},{"react/jsx-dev-runtime":"iTorj","./selection-form":"cE4xb","react-dom/client":"lOjBx","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"iTorj":[function(require,module,exports) {
+},{"react/jsx-dev-runtime":"iTorj","./selection-form":"cE4xb","react-dom/client":"lOjBx","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru","./food-list":"bZnFQ","react":"21dqq"}],"iTorj":[function(require,module,exports) {
 'use strict';
 module.exports = require('./cjs/react-jsx-dev-runtime.development.js');
 
@@ -3742,42 +3802,90 @@ var _titleCase = require("title-case");
 var _foods = require("./foods");
 var _emojiHeader = require("./emojis/emoji-header");
 var _react = require("react");
-var _s = $RefreshSig$();
+var _copyToClipboard = require("copy-to-clipboard");
+var _copyToClipboardDefault = parcelHelpers.interopDefault(_copyToClipboard);
+var _s = $RefreshSig$(), _s1 = $RefreshSig$();
 const preventDefault = (e)=>e.preventDefault()
 ;
-const createMeals = (quantity)=>{
-    const meals = [];
+const createMeals = (quantity, pinnedMeals)=>{
+    const meals = [
+        ...pinnedMeals
+    ];
+    const remaining = quantity - meals.length;
     const foods = _foods.getFoodsByType();
-    const proteins = _lodashDefault.default.shuffle(foods.proteins);
+    const proteins = _lodashDefault.default.shuffle(foods.proteins).filter((p)=>!meals.some((m)=>m.protein.name === p.name
+        )
+    );
     const carbs = _lodashDefault.default.shuffle(foods.carbs);
     const veggies = _lodashDefault.default.shuffle(foods.veggies);
-    for(let i = 0; i < quantity; i++){
+    for(let i = 0; i < remaining; i++){
         const protein = proteins.pop();
         if (!protein) break;
         const meal = {
             protein
         };
-        if (!protein.carb) meal.carb = carbs.pop();
-        if (!protein.veggie) meal.veggie = veggies.pop();
+        if (protein.sides) protein.sides.forEach((side)=>{
+            if (side.veggie) meal.veggie = side;
+            else if (side.carb) meal.carb = side;
+        });
+        if (!meal.carb && !meal.veggie?.carb && !protein.carb) meal.carb = carbs.pop();
+        if (!meal.veggie && !meal.carb?.veggie && !protein.veggie) meal.veggie = veggies.pop();
         meals.push(meal);
     }
     return meals;
 };
-const SelectionForm = ()=>{
+const usePinned = ()=>{
     _s();
-    const [_, reRender] = _react.useState(0);
+    const [pinned, setPinned] = _react.useState([]);
+    const togglePin = (meal)=>{
+        const idx = pinned.indexOf(meal);
+        if (idx < 0) setPinned([
+            ...pinned,
+            meal
+        ]);
+        else setPinned([
+            ...pinned.slice(0, idx),
+            ...pinned.slice(idx)
+        ]);
+    };
+    return {
+        pinned,
+        togglePin
+    };
+};
+_s(usePinned, "KEkRKYocjVrjbVwbCtRVIIuVess=");
+const copyMeals = (meals)=>()=>{
+        _copyToClipboardDefault.default(meals.map((m)=>[
+                m.protein.name,
+                m.veggie?.name,
+                m.carb?.name
+            ].filter(Boolean).join(", ")
+        ).join("\n"));
+    }
+;
+const SelectionForm = ()=>{
+    _s1();
+    const [reRenderCount, reRender] = _react.useState(0);
     const { register , watch  } = _reactHookForm.useForm({
         defaultValues: {
             days: 10
         }
     });
     const days = watch("days");
-    const meals = createMeals(Number(days));
+    const { pinned , togglePin  } = usePinned();
+    const meals = _react.useMemo(()=>createMeals(days, pinned)
+    , [
+        days,
+        reRenderCount,
+        pinned
+    ]);
     return /*#__PURE__*/ _jsxDevRuntime.jsxDEV(_jsxDevRuntime.Fragment, {
         children: [
-            /*#__PURE__*/ _jsxDevRuntime.jsxDEV(_emojiHeader.EmojiHeader, {}, void 0, false, {
+            /*#__PURE__*/ _jsxDevRuntime.jsxDEV(_emojiHeader.EmojiHeader, {
+                reRenderCount: `${reRenderCount}${days}`
+            }, void 0, false, {
                 fileName: "src/selection-form.tsx",
-                lineNumber: 45,
+                lineNumber: 93,
                 columnNumber: 7
             }, undefined),
             /*#__PURE__*/ _jsxDevRuntime.jsxDEV("form", {
@@ -3793,12 +3901,12 @@ const SelectionForm = ()=>{
                             autoFocus: true
                         }, void 0, false, {
                             fileName: "src/selection-form.tsx",
-                            lineNumber: 48,
+                            lineNumber: 96,
                             columnNumber: 11
                         }, undefined)
                     }, void 0, false, {
                         fileName: "src/selection-form.tsx",
-                        lineNumber: 47,
+                        lineNumber: 95,
                         columnNumber: 9
                     }, undefined),
                     /*#__PURE__*/ _jsxDevRuntime.jsxDEV("div", {
@@ -3809,18 +3917,18 @@ const SelectionForm = ()=>{
                             children: "Shuffle"
                         }, void 0, false, {
                             fileName: "src/selection-form.tsx",
-                            lineNumber: 57,
+                            lineNumber: 105,
                             columnNumber: 11
                         }, undefined)
                     }, void 0, false, {
                         fileName: "src/selection-form.tsx",
-                        lineNumber: 56,
+                        lineNumber: 104,
                         columnNumber: 9
                     }, undefined)
                 ]
             }, void 0, true, {
                 fileName: "src/selection-form.tsx",
-                lineNumber: 46,
+                lineNumber: 94,
                 columnNumber: 7
             }, undefined),
             /*#__PURE__*/ _jsxDevRuntime.jsxDEV("table", {
@@ -3834,82 +3942,105 @@ const SelectionForm = ()=>{
                                     children: "Protein"
                                 }, void 0, false, {
                                     fileName: "src/selection-form.tsx",
-                                    lineNumber: 63,
+                                    lineNumber: 111,
                                     columnNumber: 13
                                 }, undefined),
                                 /*#__PURE__*/ _jsxDevRuntime.jsxDEV("th", {
                                     children: "Carb"
                                 }, void 0, false, {
                                     fileName: "src/selection-form.tsx",
-                                    lineNumber: 64,
+                                    lineNumber: 112,
                                     columnNumber: 13
                                 }, undefined),
                                 /*#__PURE__*/ _jsxDevRuntime.jsxDEV("th", {
                                     children: "Veggie"
                                 }, void 0, false, {
                                     fileName: "src/selection-form.tsx",
-                                    lineNumber: 65,
+                                    lineNumber: 113,
                                     columnNumber: 13
                                 }, undefined)
                             ]
                         }, void 0, true, {
                             fileName: "src/selection-form.tsx",
-                            lineNumber: 62,
+                            lineNumber: 110,
                             columnNumber: 11
                         }, undefined)
                     }, void 0, false, {
                         fileName: "src/selection-form.tsx",
-                        lineNumber: 61,
+                        lineNumber: 109,
                         columnNumber: 9
                     }, undefined),
                     /*#__PURE__*/ _jsxDevRuntime.jsxDEV("tbody", {
+                        style: {
+                            cursor: "pointer"
+                        },
                         children: meals.map((meal)=>/*#__PURE__*/ _jsxDevRuntime.jsxDEV("tr", {
+                                onClick: ()=>togglePin(meal)
+                                ,
+                                className: pinned.includes(meal) ? "pinned" : undefined,
                                 children: [
                                     /*#__PURE__*/ _jsxDevRuntime.jsxDEV("td", {
                                         children: _titleCase.titleCase(meal.protein.name)
                                     }, void 0, false, {
                                         fileName: "src/selection-form.tsx",
-                                        lineNumber: 71,
+                                        lineNumber: 123,
                                         columnNumber: 15
                                     }, undefined),
                                     /*#__PURE__*/ _jsxDevRuntime.jsxDEV("td", {
                                         children: meal.carb && _titleCase.titleCase(meal.carb.name)
                                     }, void 0, false, {
                                         fileName: "src/selection-form.tsx",
-                                        lineNumber: 72,
+                                        lineNumber: 124,
                                         columnNumber: 15
                                     }, undefined),
                                     /*#__PURE__*/ _jsxDevRuntime.jsxDEV("td", {
                                         children: meal.veggie && _titleCase.titleCase(meal.veggie.name)
                                     }, void 0, false, {
                                         fileName: "src/selection-form.tsx",
-                                        lineNumber: 73,
+                                        lineNumber: 125,
                                         columnNumber: 15
                                     }, undefined)
                                 ]
                             }, meal.protein.name, true, {
                                 fileName: "src/selection-form.tsx",
-                                lineNumber: 70,
+                                lineNumber: 118,
                                 columnNumber: 13
                             }, undefined)
                         )
                     }, void 0, false, {
                         fileName: "src/selection-form.tsx",
-                        lineNumber: 68,
+                        lineNumber: 116,
                         columnNumber: 9
                     }, undefined)
                 ]
             }, void 0, true, {
                 fileName: "src/selection-form.tsx",
-                lineNumber: 60,
+                lineNumber: 108,
+                columnNumber: 7
+            }, undefined),
+            /*#__PURE__*/ _jsxDevRuntime.jsxDEV("div", {
+                className: "text-center",
+                children: /*#__PURE__*/ _jsxDevRuntime.jsxDEV("button", {
+                    className: "copy-results",
+                    onClick: copyMeals(meals),
+                    children: "Copy results"
+                }, void 0, false, {
+                    fileName: "src/selection-form.tsx",
+                    lineNumber: 131,
+                    columnNumber: 9
+                }, undefined)
+            }, void 0, false, {
+                fileName: "src/selection-form.tsx",
+                lineNumber: 130,
                 columnNumber: 7
             }, undefined)
         ]
     }, void 0, true);
 };
-_s(SelectionForm, "X6GJFCqub5rbNawHR04E1ZY7DDM=", false, function() {
+_s1(SelectionForm, "3IoFQZYC62PFZxi6Ijp8s8YgMoE=", false, function() {
     return [
-        _reactHookForm.useForm
+        _reactHookForm.useForm,
+        usePinned
     ];
 });
 _c = SelectionForm;
@@ -3921,7 +4052,7 @@ $RefreshReg$(_c, "SelectionForm");
   window.$RefreshReg$ = prevRefreshReg;
   window.$RefreshSig$ = prevRefreshSig;
 }
-},{"react/jsx-dev-runtime":"iTorj","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru","react-hook-form":"kRky9","lodash":"3qBDj","./foods":"e3v4J","title-case":"9IgWt","./emojis/emoji-header":"bClET","react":"21dqq"}],"gkKU3":[function(require,module,exports) {
+},{"react/jsx-dev-runtime":"iTorj","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru","react-hook-form":"kRky9","lodash":"3qBDj","./foods":"e3v4J","title-case":"9IgWt","./emojis/emoji-header":"bClET","react":"21dqq","copy-to-clipboard":"fLPFI"}],"gkKU3":[function(require,module,exports) {
 exports.interopDefault = function(a) {
     return a && a.__esModule ? a : {
         default: a
@@ -20295,10 +20426,12 @@ parcelHelpers.export(exports, "foods", ()=>foods
 parcelHelpers.export(exports, "getFoodsByType", ()=>getFoodsByType
 );
 const rice = {
+    name: "rice",
     carb: true,
     weight: 100
 };
 const polenta = {
+    name: "polenta",
     carb: true,
     weight: 0
 };
@@ -20309,101 +20442,127 @@ const shrimp = {
         rice
     ]
 };
-const veggies = {
-    salad: {
+const veggies = [
+    {
+        name: "salad",
         veggie: true,
         weight: 100
     },
-    broccoli: {
+    {
+        name: "broccoli",
         veggie: true,
         weight: 50
     },
-    "green beans": {
+    {
+        name: "green beans",
         veggie: true,
         weight: 50
     },
-    asparagus: {
+    {
+        name: "asparagus",
         veggie: true,
         weight: 75
     },
-    "wilted chard": {
+    {
+        name: "wilted chard",
         veggie: true,
         weight: 10
     },
-    "wilted kale": {
+    {
+        name: "wilted kale",
         veggie: true,
         weight: 10
     },
-    "wilted spinach": {
+    {
+        name: "wilted spinach",
         veggie: true,
         weight: 10
-    }
-};
-const carbs = {
+    }, 
+];
+const carbs = [
     rice,
-    "crusty bread": {
+    {
+        name: "crusty bread",
         carb: true,
         weight: 10
     }
-};
-const proteins = {
-    "rotisserie chicken": {
+];
+const proteins = [
+    {
+        name: "rotisserie chicken",
         protein: true,
         weight: 100
     },
-    salmon: {
+    {
+        name: "salmon",
         protein: true,
         weight: 100
     },
-    steak: {
+    {
+        name: "steak",
         protein: true,
         weight: 50
     },
-    "garlic shrimp": shrimp,
-    "anne red sauce shrimp": shrimp,
-    lentils: {
+    {
+        name: "garlic shrimp",
+        ...shrimp
+    },
+    {
+        name: "anne red sauce shrimp",
+        ...shrimp
+    },
+    {
+        name: "lentils",
         protein: true,
         weight: 50
     },
-    "pesto turkey burgers": {
+    {
+        name: "pesto turkey burgers",
         protein: true,
         weight: 100
     },
-    chicken: {
+    {
+        name: "chicken",
         protein: true,
         weight: 100
-    }
-};
-const combos = {
-    "fajita bowl": {
+    }, 
+];
+const combos = [
+    {
+        name: "fajita bowl",
         protein: true,
         veggie: true,
         carb: true,
         weight: 100
     },
-    "sheet pan greek chicken": {
+    {
+        name: "sheet pan greek chicken",
         protein: true,
         veggie: true,
         weight: 50
     },
-    "crispy tortellini": {
+    {
+        name: "crispy tortellini",
         protein: true,
         carb: true,
         weight: 50
     },
-    "spicy squash salad with lentils and goat cheese": {
+    {
+        name: "spicy squash salad with lentils and goat cheese",
         protein: true,
         carb: true,
         veggie: true,
         weight: 50
     },
-    "easiest chicken noodle soup": {
+    {
+        name: "easiest chicken noodle soup",
         protein: true,
         veggie: true,
         carb: true,
         weight: 50
     },
-    "oven braised beef with tomato and garlic": {
+    {
+        name: "oven braised beef with tomato and garlic",
         protein: true,
         carb: true,
         weight: 50,
@@ -20411,30 +20570,27 @@ const combos = {
             polenta
         ]
     },
-    "white chili": {
+    {
+        name: "white chili",
         protein: true,
         carb: true,
         weight: 50
-    }
-};
-const foods = {
+    }, 
+];
+const foods = [
     ...veggies,
     ...carbs,
     ...proteins,
     ...combos
-};
+];
 const getFoodsByType = ()=>{
     const proteins1 = [];
     const carbs1 = [];
     const veggies1 = [];
-    Object.entries(foods).forEach(([k, v])=>{
-        const val = {
-            ...v,
-            name: k
-        };
-        if (v.protein) proteins1.push(val);
-        else if (v.veggie) veggies1.push(val);
-        else if (v.carb) carbs1.push(val);
+    foods.forEach((food)=>{
+        if (food.protein) proteins1.push(food);
+        else if (food.veggie) veggies1.push(food);
+        else if (food.carb) carbs1.push(food);
     });
     return {
         proteins: proteins1,
@@ -20486,25 +20642,32 @@ parcelHelpers.export(exports, "EmojiHeader", ()=>EmojiHeader
 var _jsxDevRuntime = require("react/jsx-dev-runtime");
 var _lodash = require("lodash");
 var _lodashDefault = parcelHelpers.interopDefault(_lodash);
-var _getEmojis = require("./get-emojis");
-const EmojiHeader = ()=>{
-    const emojis = _lodashDefault.default.shuffle(_getEmojis.getEmojis());
+var _emojis = require("./emojis");
+var _react = require("react");
+var _s = $RefreshSig$();
+const EmojiHeader = ({ reRenderCount  })=>{
+    _s();
+    const shuffledEmojis = _react.useMemo(()=>_lodashDefault.default.shuffle(_emojis.emojis)
+    , [
+        reRenderCount
+    ]);
     return /*#__PURE__*/ _jsxDevRuntime.jsxDEV("div", {
         className: "emoji-header",
-        children: emojis.slice(0, 5).map((e)=>/*#__PURE__*/ _jsxDevRuntime.jsxDEV("span", {
+        children: shuffledEmojis.slice(0, 5).map((e)=>/*#__PURE__*/ _jsxDevRuntime.jsxDEV("span", {
                 children: e
             }, e, false, {
                 fileName: "src/emojis/emoji-header.tsx",
-                lineNumber: 9,
+                lineNumber: 12,
                 columnNumber: 9
             }, undefined)
         )
     }, void 0, false, {
         fileName: "src/emojis/emoji-header.tsx",
-        lineNumber: 7,
+        lineNumber: 10,
         columnNumber: 5
     }, undefined);
 };
+_s(EmojiHeader, "DOvGGfRfcwkiVUOWt374pmNM66U=");
 _c = EmojiHeader;
 var _c;
 $RefreshReg$(_c, "EmojiHeader");
@@ -20514,116 +20677,228 @@ $RefreshReg$(_c, "EmojiHeader");
   window.$RefreshReg$ = prevRefreshReg;
   window.$RefreshSig$ = prevRefreshSig;
 }
-},{"react/jsx-dev-runtime":"iTorj","lodash":"3qBDj","./get-emojis":"6OXWd","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"6OXWd":[function(require,module,exports) {
+},{"react/jsx-dev-runtime":"iTorj","lodash":"3qBDj","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru","./emojis":"eguKu","react":"21dqq"}],"eguKu":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "getEmojis", ()=>getEmojis
+parcelHelpers.export(exports, "emojis", ()=>emojis
 );
-const getEmojis = ()=>[
-        "🍇",
-        "🍈",
-        "🍉",
-        "🍊",
-        "🍋",
-        "🍌",
-        "🍍",
-        "🥭",
-        "🍎",
-        "🍏",
-        "🍐",
-        "🍑",
-        "🍒",
-        "🍓",
-        "🫐",
-        "🥝",
-        "🍅",
-        "🫒",
-        "🥥",
-        "🥑",
-        "🍆",
-        "🥔",
-        "🥕",
-        "🌽",
-        "🌶️",
-        "🫑",
-        "🥒",
-        "🥬",
-        "🥦",
-        "🧄",
-        "🧅",
-        "🍄",
-        "🥜",
-        "🌰",
-        "🍞",
-        "🥐",
-        "🥖",
-        "🫓",
-        "🥨",
-        "🥯",
-        "🥞",
-        "🧇",
-        "🧀",
-        "🍖",
-        "🍗",
-        "🥩",
-        "🥓",
-        "🍔",
-        "🍟",
-        "🍕",
-        "🌭",
-        "🥪",
-        "🌮",
-        "🌯",
-        "🫔",
-        "🥙",
-        "🧆",
-        "🥚",
-        "🍳",
-        "🥘",
-        "🍲",
-        "🫕",
-        "🥣",
-        "🥗",
-        "🍿",
-        "🧈",
-        "🧂",
-        "🥫",
-        "🍱",
-        "🍘",
-        "🍙",
-        "🍚",
-        "🍛",
-        "🍜",
-        "🍝",
-        "🍠",
-        "🍢",
-        "🍣",
-        "🍤",
-        "🍥",
-        "🥮",
-        "🍡",
-        "🥟",
-        "🥠",
-        "🥡",
-        "🦪",
-        "🍦",
-        "🍧",
-        "🍨",
-        "🍩",
-        "🍪",
-        "🎂",
-        "🍰",
-        "🧁",
-        "🥧",
-        "🍫",
-        "🍬",
-        "🍭",
-        "🍮",
-        "🍯", 
-    ]
-;
+const emojis = [
+    "🍇",
+    "🍈",
+    "🍉",
+    "🍊",
+    "🍋",
+    "🍌",
+    "🍍",
+    "🥭",
+    "🍎",
+    "🍏",
+    "🍐",
+    "🍑",
+    "🍒",
+    "🍓",
+    "🫐",
+    "🥝",
+    "🍅",
+    "🫒",
+    "🥥",
+    "🥑",
+    "🍆",
+    "🥔",
+    "🥕",
+    "🌽",
+    "🌶️",
+    "🫑",
+    "🥒",
+    "🥬",
+    "🥦",
+    "🧄",
+    "🧅",
+    "🍄",
+    "🥜",
+    "🌰",
+    "🍞",
+    "🥐",
+    "🥖",
+    "🫓",
+    "🥨",
+    "🥯",
+    "🥞",
+    "🧇",
+    "🧀",
+    "🍖",
+    "🍗",
+    "🥩",
+    "🥓",
+    "🍔",
+    "🍟",
+    "🍕",
+    "🌭",
+    "🥪",
+    "🌮",
+    "🌯",
+    "🫔",
+    "🥙",
+    "🧆",
+    "🥚",
+    "🍳",
+    "🥘",
+    "🍲",
+    "🫕",
+    "🥣",
+    "🥗",
+    "🍿",
+    "🧈",
+    "🧂",
+    "🥫",
+    "🍱",
+    "🍘",
+    "🍙",
+    "🍚",
+    "🍛",
+    "🍜",
+    "🍝",
+    "🍠",
+    "🍢",
+    "🍣",
+    "🍤",
+    "🍥",
+    "🥮",
+    "🍡",
+    "🥟",
+    "🥠",
+    "🥡",
+    "🦪",
+    "🍦",
+    "🍧",
+    "🍨",
+    "🍩",
+    "🍪",
+    "🎂",
+    "🍰",
+    "🧁",
+    "🥧",
+    "🍫",
+    "🍬",
+    "🍭",
+    "🍮",
+    "🍯", 
+];
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"lOjBx":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"fLPFI":[function(require,module,exports) {
+"use strict";
+var deselectCurrent = require("toggle-selection");
+var clipboardToIE11Formatting = {
+    "text/plain": "Text",
+    "text/html": "Url",
+    "default": "Text"
+};
+var defaultMessage = "Copy to clipboard: #{key}, Enter";
+function format(message) {
+    var copyKey = (/mac os x/i.test(navigator.userAgent) ? "⌘" : "Ctrl") + "+C";
+    return message.replace(/#{\s*key\s*}/g, copyKey);
+}
+function copy(text, options) {
+    var debug, message, reselectPrevious, range, selection, mark, success = false;
+    if (!options) options = {};
+    debug = options.debug || false;
+    try {
+        reselectPrevious = deselectCurrent();
+        range = document.createRange();
+        selection = document.getSelection();
+        mark = document.createElement("span");
+        mark.textContent = text;
+        // reset user styles for span element
+        mark.style.all = "unset";
+        // prevents scrolling to the end of the page
+        mark.style.position = "fixed";
+        mark.style.top = 0;
+        mark.style.clip = "rect(0, 0, 0, 0)";
+        // used to preserve spaces and line breaks
+        mark.style.whiteSpace = "pre";
+        // do not inherit user-select (it may be `none`)
+        mark.style.webkitUserSelect = "text";
+        mark.style.MozUserSelect = "text";
+        mark.style.msUserSelect = "text";
+        mark.style.userSelect = "text";
+        mark.addEventListener("copy", function(e) {
+            e.stopPropagation();
+            if (options.format) {
+                e.preventDefault();
+                if (typeof e.clipboardData === "undefined") {
+                    debug && console.warn("unable to use e.clipboardData");
+                    debug && console.warn("trying IE specific stuff");
+                    window.clipboardData.clearData();
+                    var format1 = clipboardToIE11Formatting[options.format] || clipboardToIE11Formatting["default"];
+                    window.clipboardData.setData(format1, text);
+                } else {
+                    e.clipboardData.clearData();
+                    e.clipboardData.setData(options.format, text);
+                }
+            }
+            if (options.onCopy) {
+                e.preventDefault();
+                options.onCopy(e.clipboardData);
+            }
+        });
+        document.body.appendChild(mark);
+        range.selectNodeContents(mark);
+        selection.addRange(range);
+        var successful = document.execCommand("copy");
+        if (!successful) throw new Error("copy command was unsuccessful");
+        success = true;
+    } catch (err) {
+        debug && console.error("unable to copy using execCommand: ", err);
+        debug && console.warn("trying IE specific stuff");
+        try {
+            window.clipboardData.setData(options.format || "text", text);
+            options.onCopy && options.onCopy(window.clipboardData);
+            success = true;
+        } catch (err) {
+            debug && console.error("unable to copy using clipboardData: ", err);
+            debug && console.error("falling back to prompt");
+            message = format("message" in options ? options.message : defaultMessage);
+            window.prompt(message, text);
+        }
+    } finally{
+        if (selection) {
+            if (typeof selection.removeRange == "function") selection.removeRange(range);
+            else selection.removeAllRanges();
+        }
+        if (mark) document.body.removeChild(mark);
+        reselectPrevious();
+    }
+    return success;
+}
+module.exports = copy;
+
+},{"toggle-selection":"jmaua"}],"jmaua":[function(require,module,exports) {
+module.exports = function() {
+    var selection = document.getSelection();
+    if (!selection.rangeCount) return function() {};
+    var active = document.activeElement;
+    var ranges = [];
+    for(var i = 0; i < selection.rangeCount; i++)ranges.push(selection.getRangeAt(i));
+    switch(active.tagName.toUpperCase()){
+        case 'INPUT':
+        case 'TEXTAREA':
+            active.blur();
+            break;
+        default:
+            active = null;
+            break;
+    }
+    selection.removeAllRanges();
+    return function() {
+        selection.type === 'Caret' && selection.removeAllRanges();
+        if (!selection.rangeCount) ranges.forEach(function(range) {
+            selection.addRange(range);
+        });
+        active && active.focus();
+    };
+};
+
+},{}],"lOjBx":[function(require,module,exports) {
 'use strict';
 var m = require('react-dom');
 var i = m.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
@@ -41996,6 +42271,113 @@ module.exports = require('./cjs/scheduler.development.js');
     /* global __REACT_DEVTOOLS_GLOBAL_HOOK__ */ if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== 'undefined' && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop === 'function') __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop(new Error());
 })();
 
-},{}]},["kn9T2","5YpQr","41oNQ"], "41oNQ", "parcelRequiree388")
+},{}],"bZnFQ":[function(require,module,exports) {
+var $parcel$ReactRefreshHelpers$49e8 = require("@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
+var prevRefreshReg = window.$RefreshReg$;
+var prevRefreshSig = window.$RefreshSig$;
+$parcel$ReactRefreshHelpers$49e8.prelude(module);
+
+try {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "FoodList", ()=>FoodList
+);
+var _jsxDevRuntime = require("react/jsx-dev-runtime");
+var _foods = require("./foods");
+const { proteins , veggies , carbs  } = _foods.getFoodsByType();
+const List = ({ title , data  })=>/*#__PURE__*/ _jsxDevRuntime.jsxDEV("div", {
+        className: "list",
+        children: [
+            /*#__PURE__*/ _jsxDevRuntime.jsxDEV("h2", {
+                children: title
+            }, void 0, false, {
+                fileName: "src/food-list.tsx",
+                lineNumber: 11,
+                columnNumber: 5
+            }, undefined),
+            /*#__PURE__*/ _jsxDevRuntime.jsxDEV("ul", {
+                children: data.map((d)=>/*#__PURE__*/ _jsxDevRuntime.jsxDEV("li", {
+                        children: d.name
+                    }, d.name, false, {
+                        fileName: "src/food-list.tsx",
+                        lineNumber: 14,
+                        columnNumber: 9
+                    }, undefined)
+                )
+            }, void 0, false, {
+                fileName: "src/food-list.tsx",
+                lineNumber: 12,
+                columnNumber: 5
+            }, undefined)
+        ]
+    }, void 0, true, {
+        fileName: "src/food-list.tsx",
+        lineNumber: 10,
+        columnNumber: 3
+    }, undefined)
+;
+_c = List;
+const FoodList = ()=>{
+    return /*#__PURE__*/ _jsxDevRuntime.jsxDEV("div", {
+        id: "food-list",
+        children: [
+            /*#__PURE__*/ _jsxDevRuntime.jsxDEV("h1", {
+                children: "Food List"
+            }, void 0, false, {
+                fileName: "src/food-list.tsx",
+                lineNumber: 23,
+                columnNumber: 7
+            }, undefined),
+            /*#__PURE__*/ _jsxDevRuntime.jsxDEV("div", {
+                className: "lists",
+                children: [
+                    /*#__PURE__*/ _jsxDevRuntime.jsxDEV(List, {
+                        title: "Protein",
+                        data: proteins
+                    }, void 0, false, {
+                        fileName: "src/food-list.tsx",
+                        lineNumber: 25,
+                        columnNumber: 9
+                    }, undefined),
+                    /*#__PURE__*/ _jsxDevRuntime.jsxDEV(List, {
+                        title: "Veggies",
+                        data: veggies
+                    }, void 0, false, {
+                        fileName: "src/food-list.tsx",
+                        lineNumber: 26,
+                        columnNumber: 9
+                    }, undefined),
+                    /*#__PURE__*/ _jsxDevRuntime.jsxDEV(List, {
+                        title: "Carbs",
+                        data: carbs
+                    }, void 0, false, {
+                        fileName: "src/food-list.tsx",
+                        lineNumber: 27,
+                        columnNumber: 9
+                    }, undefined)
+                ]
+            }, void 0, true, {
+                fileName: "src/food-list.tsx",
+                lineNumber: 24,
+                columnNumber: 7
+            }, undefined)
+        ]
+    }, void 0, true, {
+        fileName: "src/food-list.tsx",
+        lineNumber: 22,
+        columnNumber: 5
+    }, undefined);
+};
+_c1 = FoodList;
+var _c, _c1;
+$RefreshReg$(_c, "List");
+$RefreshReg$(_c1, "FoodList");
+
+  $parcel$ReactRefreshHelpers$49e8.postlude(module);
+} finally {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+},{"react/jsx-dev-runtime":"iTorj","./foods":"e3v4J","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}]},["kn9T2","5YpQr","41oNQ"], "41oNQ", "parcelRequiree388")
 
 //# sourceMappingURL=index.303574b1.js.map

@@ -1,4 +1,5 @@
 export type Food = {
+  name: string;
   protein?: boolean;
   carb?: boolean;
   veggie?: boolean;
@@ -6,83 +7,82 @@ export type Food = {
   sides?: Food[];
 };
 
-export type FoodWithName = Food & { name: string };
+type FoodWithoutName = Omit<Food, "name">;
 
-const rice: Food = { carb: true, weight: 100 };
-const polenta: Food = { carb: true, weight: 0 };
-const shrimp: Food = { protein: true, weight: 75, sides: [rice] };
+const rice: Food = { name: "rice", carb: true, weight: 100 };
+const polenta: Food = { name: "polenta", carb: true, weight: 0 };
 
-const veggies: Record<string, Food> = {
-  salad: { veggie: true, weight: 100 },
-  broccoli: { veggie: true, weight: 50 },
-  "green beans": { veggie: true, weight: 50 },
-  asparagus: { veggie: true, weight: 75 },
-  "wilted chard": { veggie: true, weight: 10 },
-  "wilted kale": { veggie: true, weight: 10 },
-  "wilted spinach": { veggie: true, weight: 10 },
+const shrimp: FoodWithoutName = {
+  protein: true,
+  weight: 75,
+  sides: [rice],
 };
 
-const carbs: Record<string, Food> = {
-  rice,
-  "crusty bread": { carb: true, weight: 10 },
-};
+const veggies: Food[] = [
+  { name: "salad", veggie: true, weight: 100 },
+  { name: "broccoli", veggie: true, weight: 50 },
+  { name: "green beans", veggie: true, weight: 50 },
+  { name: "asparagus", veggie: true, weight: 75 },
+  { name: "wilted chard", veggie: true, weight: 10 },
+  { name: "wilted kale", veggie: true, weight: 10 },
+  { name: "wilted spinach", veggie: true, weight: 10 },
+];
 
-const proteins: Record<string, Food> = {
-  "rotisserie chicken": { protein: true, weight: 100 },
-  salmon: { protein: true, weight: 100 },
-  steak: { protein: true, weight: 50 },
-  "garlic shrimp": shrimp,
-  "anne red sauce shrimp": shrimp,
-  lentils: { protein: true, weight: 50 },
-  "pesto turkey burgers": { protein: true, weight: 100 },
-  chicken: { protein: true, weight: 100 },
-};
+const carbs: Food[] = [rice, { name: "crusty bread", carb: true, weight: 10 }];
 
-const combos: Record<string, Food> = {
-  "fajita bowl": { protein: true, veggie: true, carb: true, weight: 100 },
-  "sheet pan greek chicken": { protein: true, veggie: true, weight: 50 },
-  "crispy tortellini": { protein: true, carb: true, weight: 50 },
-  "spicy squash salad with lentils and goat cheese": {
+const proteins: Food[] = [
+  { name: "rotisserie chicken", protein: true, weight: 100 },
+  { name: "salmon", protein: true, weight: 100 },
+  { name: "steak", protein: true, weight: 50 },
+  { name: "garlic shrimp", ...shrimp },
+  { name: "anne red sauce shrimp", ...shrimp },
+  { name: "lentils", protein: true, weight: 50 },
+  { name: "pesto turkey burgers", protein: true, weight: 100 },
+  { name: "chicken", protein: true, weight: 100 },
+];
+
+const combos: Food[] = [
+  { name: "fajita bowl", protein: true, veggie: true, carb: true, weight: 100 },
+  { name: "sheet pan greek chicken", protein: true, veggie: true, weight: 50 },
+  { name: "crispy tortellini", protein: true, carb: true, weight: 50 },
+  {
+    name: "spicy squash salad with lentils and goat cheese",
     protein: true,
     carb: true,
     veggie: true,
     weight: 50,
   },
-  "easiest chicken noodle soup": {
+  {
+    name: "easiest chicken noodle soup",
     protein: true,
     veggie: true,
     carb: true,
     weight: 50,
   },
-  "oven braised beef with tomato and garlic": {
+  {
+    name: "oven braised beef with tomato and garlic",
     protein: true,
     carb: true,
     weight: 50,
     sides: [polenta],
   },
-  "white chili": { protein: true, carb: true, weight: 50 },
-};
+  { name: "white chili", protein: true, carb: true, weight: 50 },
+];
 
-export const foods = {
-  ...veggies,
-  ...carbs,
-  ...proteins,
-  ...combos,
-};
+export const foods = [...veggies, ...carbs, ...proteins, ...combos];
 
 export const getFoodsByType = () => {
-  const proteins: FoodWithName[] = [];
-  const carbs: FoodWithName[] = [];
-  const veggies: FoodWithName[] = [];
+  const proteins: Food[] = [];
+  const carbs: Food[] = [];
+  const veggies: Food[] = [];
 
-  Object.entries(foods).forEach(([k, v]) => {
-    const val = { ...v, name: k };
-    if (v.protein) {
-      proteins.push(val);
-    } else if (v.veggie) {
-      veggies.push(val);
-    } else if (v.carb) {
-      carbs.push(val);
+  foods.forEach((food) => {
+    if (food.protein) {
+      proteins.push(food);
+    } else if (food.veggie) {
+      veggies.push(food);
+    } else if (food.carb) {
+      carbs.push(food);
     }
   });
 

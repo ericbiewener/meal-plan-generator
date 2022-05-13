@@ -1,4 +1,4 @@
-export const getEmojis = () => [
+export const emojis = [
   "🍇",
   "🍈",
   "🍉",
