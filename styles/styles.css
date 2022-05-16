@@ -6,6 +6,10 @@ body {
   font-size: 16px;
 }
 
+button {
+  cursor: pointer;
+}
+
 #settings {
   text-align: center;
   margin: 2rem 0 3rem 0;
@@ -98,4 +102,18 @@ input[type="number"] {
 
 .copy-results {
   margin-top: 3rem;
+}
+
+.emoji-button {
+  background: none;
+  border: none;
+}
+
+.meal-plan-table .emoji-button {
+  visibility: hidden;
+  margin-left: -25px;
+}
+
+.meal-plan-table tr:hover .emoji-button {
+  visibility: visible;
 }

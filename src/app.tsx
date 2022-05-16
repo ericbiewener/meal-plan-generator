@@ -1,4 +1,4 @@
-import { SelectionForm } from "./selection-form";
+import { MealPlanGenerator } from "./meal-plan-generator";
 import { createRoot } from "react-dom/client";
 import { FoodList } from "./food-list";
 import { useState } from "react";
@@ -25,8 +25,8 @@ const App = () => {
         <button onClick={() => setScreen("generator")}>Meal Generator</button>
         <button onClick={() => setScreen("foodList")}>Food List</button>
       </div>
-      {/* Never unmount SelectionForm so that we don't lose its state */}
-      <div style={{ display: visibleScreen ? "none" : "block" }}><SelectionForm /></div>
+      {/* Never unmount MealPlanGenerator so that we don't lose its state */}
+      <div style={{ display: visibleScreen ? "none" : "block" }}><MealPlanGenerator /></div>
       {visibleScreen}
     </>
   );
