@@ -1,8 +1,8 @@
 import { useForm } from "react-hook-form";
 import _ from "lodash";
 import { titleCase } from "title-case";
-import { getFoodsByType, Food } from "./foods";
-import { EmojiHeader } from "./emojis/emoji-header";
+import { getFoodsByType, Food } from "../foods";
+import { EmojiHeader } from "../emojis/emoji-header";
 import {
   useState,
   SyntheticEvent,
@@ -11,6 +11,10 @@ import {
   SetStateAction,
 } from "react";
 import copy from "copy-to-clipboard";
+import { mergeClass } from "../components";
+
+const Td = mergeClass("td", "p-1")
+const Th = mergeClass("th", "p-1")
 
 type Meal = {
   protein: Food;
@@ -131,7 +135,7 @@ export const MealPlanGenerator = () => {
   return (
     <>
       <EmojiHeader reRenderCount={`${reRenderCount}${days}`} />
-      <form id="settings" onSubmit={preventDefault}>
+      <form className="text-center" onSubmit={preventDefault}>
         <div>
           <input
             {...register("days")}
@@ -146,11 +150,11 @@ export const MealPlanGenerator = () => {
         </div>
       </form>
       <table cellSpacing="0" cellPadding="0" className="meal-plan-table">
-        <thead>
+        <thead className="bg-stone-100">
           <tr>
-            <th style={{ width: "50%" }}>Protein</th>
-            <th style={{ width: "25%" }}>Carb</th>
-            <th>Veggie</th>
+            <Th className="w-1/2">Protein</Th>
+            <Th className="w-1/4">Carb</Th>
+            <Th>Veggie</Th>
           </tr>
         </thead>
         <tbody style={{ cursor: "pointer" }}>
@@ -160,8 +164,8 @@ export const MealPlanGenerator = () => {
               onClick={() => togglePin(meal)}
               className={pinned.includes(meal) ? "pinned" : undefined}
             >
-              <td>{titleCase(meal.protein.name)}</td>
-              <td>
+              <Td>{titleCase(meal.protein.name)}</Td>
+              <Td>
                 {meal.carbs && (
                   <>
                     <button
@@ -173,8 +177,8 @@ export const MealPlanGenerator = () => {
                     {titleCase(meal.carbs.name)}
                   </>
                 )}
-              </td>
-              <td>
+              </Td>
+              <Td>
                 {meal.veggies && (
                   <>
                     <button
@@ -186,7 +190,7 @@ export const MealPlanGenerator = () => {
                     {titleCase(meal.veggies.name)}
                   </>
                 )}
-              </td>
+              </Td>
             </tr>
           ))}
         </tbody>

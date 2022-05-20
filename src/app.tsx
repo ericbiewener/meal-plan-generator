@@ -1,4 +1,4 @@
-import { MealPlanGenerator } from "./meal-plan-generator";
+import { MealPlanGenerator } from "./meal-plan-generator/meal-plan-generator";
 import { createRoot } from "react-dom/client";
 import { FoodList } from "./food-list";
 import { useState } from "react";
@@ -21,8 +21,8 @@ const App = () => {
 
   return (
     <>
-      <div id="main-menu">
-        <button onClick={() => setScreen("generator")}>Meal Generator</button>
+      <div className="mb-8 text-sm text-stone-500">
+        <button onClick={() => setScreen("generator")} className="mr-5">Meal Generator</button>
         <button onClick={() => setScreen("foodList")}>Food List</button>
       </div>
       {/* Never unmount MealPlanGenerator so that we don't lose its state */}
