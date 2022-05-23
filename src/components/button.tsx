@@ -16,7 +16,7 @@ export const BgButton: FC<BgButtonProps> = ({
   ...props
 }) => (
   <button
-    className={`rounded-full px-2 py-1 text-stone-500 hover:bg-${color}-100 hover:text-${color}-500 active:bg-${color}-200 active:text-${color}-500 ${className}`}
+    className={`rounded-full px-2 py-1 text-stone-500 hover:bg-${color}-100 active:bg-${color}-200 ${className}`}
     {...props}
   />
 );
