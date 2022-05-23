@@ -14,59 +14,26 @@ body {
   @apply mx-auto;
 }
 
-table {
-  width: 100%;
-  text-align: left;
-}
-
-tbody tr:hover:not(.pinned) {
-  background: #ffffe3;
-}
-
-.day-input {
-  font-size: 5rem;
-  width: 10rem;
-  text-align: center;
-  margin-bottom: 1rem;
-}
-
-/* Chrome, Safari, Edge, Opera */
+/* Chrome, Safari, Edge, Opera -- hide arrow buttons on number input type*/
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-/* Firefox */
-input[type="number"] {
-  -moz-appearance: textfield;
+table {
+  width: 100%;
+  text-align: left;
 }
 
-#food-list .lists {
-  display: flex;
-  justify-content: space-between;
+h1 {
+  @apply text-5xl;
+  @apply font-semibold;
+  @apply mb-6;
 }
 
-#food-list .lists .list ul {
-  padding-left: 0.75rem;
-}
-
-#main-menu button:hover {
-  color: #000;
-}
-
-#main-menu button:not(:last-child) {
-  margin-right: 1rem;
-}
-
-.pinned {
-  background: #ffffc4;
-}
-
-.text-center {
-  text-align: center;
-}
-
-.copy-results {
-  margin-top: 3rem;
+h2 {
+  @apply text-3xl;
+  @apply font-semibold;
+  @apply mb-4;
 }

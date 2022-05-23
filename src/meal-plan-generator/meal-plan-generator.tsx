@@ -1,3 +1,4 @@
+import cn from "classnames";
 import { useForm } from "react-hook-form";
 import _ from "lodash";
 import { titleCase } from "title-case";
@@ -11,10 +12,7 @@ import {
   SetStateAction,
 } from "react";
 import copy from "copy-to-clipboard";
-import { mergeClass } from "../components";
-
-const Td = mergeClass("td", "p-1")
-const Th = mergeClass("th", "p-1")
+import { OutlineButton } from "../components/button";
 
 type Meal = {
   protein: Food;
@@ -74,7 +72,7 @@ const usePinned = (setMeals: Dispatch<SetStateAction<Meal[]>>) => {
       }
     }
     setPinned(newPinned);
-    console.info('::', newPinned)
+    console.info("::", newPinned);
     setMeals((allMeals) => [
       ...newPinned,
       ...allMeals.filter((m) => !newPinned.includes(m)),
@@ -102,6 +100,8 @@ const getNewValue = <V extends unknown>(arr: V[], val: V) => {
     if (v !== val) return v;
   }
 };
+
+const refreshButtonClassName = "invisible group-hover:visible mr-1 -ml-5";
 
 export const MealPlanGenerator = () => {
   const [reRenderCount, reRender] = useState(0);
@@ -136,40 +136,44 @@ export const MealPlanGenerator = () => {
     <>
       <EmojiHeader reRenderCount={`${reRenderCount}${days}`} />
       <form className="text-center" onSubmit={preventDefault}>
-        <div>
+        <div className="flex flex-col items-center">
           <input
             {...register("days")}
             type="number"
-            placeholder="Days"
-            className="day-input"
+            className="text-center text-7xl font-semibold w-32 p-2"
             autoFocus
           />
-        </div>
-        <div>
-          <button onClick={() => reRender((v) => v + 1)}>Shuffle</button>
+          <OutlineButton
+            onClick={() => reRender((v) => v + 1)}
+            className="mt-4 mb-8"
+          >
+            Shuffle
+          </OutlineButton>
         </div>
       </form>
-      <table cellSpacing="0" cellPadding="0" className="meal-plan-table">
+      <table cellSpacing="0" cellPadding="0">
         <thead className="bg-stone-100">
-          <tr>
-            <Th className="w-1/2">Protein</Th>
-            <Th className="w-1/4">Carb</Th>
-            <Th>Veggie</Th>
+          <tr className="children:p-1">
+            <th className="w-1/2">Protein</th>
+            <th className="w-1/4">Carb</th>
+            <th>Veggie</th>
           </tr>
         </thead>
-        <tbody style={{ cursor: "pointer" }}>
+        <tbody className="cursor-pointer">
           {meals.map((meal, i) => (
             <tr
               key={i}
               onClick={() => togglePin(meal)}
-              className={pinned.includes(meal) ? "pinned" : undefined}
+              className={`children:p-1 group ${
+                pinned.includes(meal) ? "bg-yellow-100" : "hover:bg-yellow-50"
+              }`}
             >
-              <Td>{titleCase(meal.protein.name)}</Td>
-              <Td>
+              <td>{titleCase(meal.protein.name)}</td>
+              <td>
                 {meal.carbs && (
                   <>
                     <button
-                      className="emoji-button"
+                      className={refreshButtonClassName}
                       onClick={shuffleFood("carbs", i)}
                     >
                       🔄
@@ -177,12 +181,12 @@ export const MealPlanGenerator = () => {
                     {titleCase(meal.carbs.name)}
                   </>
                 )}
-              </Td>
-              <Td>
+              </td>
+              <td>
                 {meal.veggies && (
                   <>
                     <button
-                      className="emoji-button"
+                      className={refreshButtonClassName}
                       onClick={shuffleFood("veggies", i)}
                     >
                       🔄
@@ -190,15 +194,15 @@ export const MealPlanGenerator = () => {
                     {titleCase(meal.veggies.name)}
                   </>
                 )}
-              </Td>
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
       <div className="text-center">
-        <button className="copy-results" onClick={copyMeals(meals)}>
+        <OutlineButton className="mt-4" onClick={copyMeals(meals)}>
           Copy results
-        </button>
+        </OutlineButton>
       </div>
     </>
   );

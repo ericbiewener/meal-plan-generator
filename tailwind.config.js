@@ -5,5 +5,9 @@ module.exports = {
   theme: {
     extend: {},
   },
-  plugins: [],
+  plugins: [
+    ({ addVariant }) => {
+      addVariant('children', '& > *')
+    }
+  ],
 }

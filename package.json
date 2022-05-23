@@ -16,7 +16,7 @@
     "@types/react": "18.0.9",
     "@types/react-dom": "18.0.4",
     "postcss": "8.4.14",
-    "tailwindcss": "3.0.24"
+    "tailwindcss": "0.0.0-insiders.770900b"
   },
   "dependencies": {
     "classnames": "2.3.1",

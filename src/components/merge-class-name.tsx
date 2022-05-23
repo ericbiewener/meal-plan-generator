@@ -12,7 +12,7 @@ type MergeClass = {
   ): FC<HTMLAttributes<El>>;
 };
 
-export const mergeClass: MergeClass =
+export const mergeClassName: MergeClass =
   (Cmp, builtInClassName) =>
   ({ className, ...props }: { className?: string }) =>
     <Cmp className={cn(builtInClassName, className)} {...props} />;
