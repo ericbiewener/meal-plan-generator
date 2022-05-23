@@ -12,7 +12,7 @@ import {
   SetStateAction,
 } from "react";
 import copy from "copy-to-clipboard";
-import { OutlineButton } from "../components/button";
+import { OutlineButton, BgButton } from "../components/button";
 
 type Meal = {
   protein: Food;
@@ -143,12 +143,12 @@ export const MealPlanGenerator = () => {
             className="text-center text-7xl font-semibold w-32 p-2"
             autoFocus
           />
-          <OutlineButton
+          <BgButton
             onClick={() => reRender((v) => v + 1)}
             className="mt-4 mb-8"
           >
             Shuffle
-          </OutlineButton>
+          </BgButton>
         </div>
       </form>
       <table cellSpacing="0" cellPadding="0">
@@ -200,9 +200,9 @@ export const MealPlanGenerator = () => {
         </tbody>
       </table>
       <div className="text-center">
-        <OutlineButton className="mt-4" onClick={copyMeals(meals)}>
+        <BgButton className="mt-4" onClick={copyMeals(meals)} color="amber">
           Copy results
-        </OutlineButton>
+        </BgButton>
       </div>
     </>
   );

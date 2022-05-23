@@ -21,7 +21,7 @@ const App = () => {
 
   return (
     <>
-      <div className="mb-8 text-sm text-stone-500">
+      <div className="mb-8 text-sm text-stone-500 hover:children:text-stone-900">
         <button onClick={() => setScreen("generator")} className="mr-5">Meal Generator</button>
         <button onClick={() => setScreen("foodList")}>Food List</button>
       </div>
