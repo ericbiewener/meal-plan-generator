@@ -20,3 +20,14 @@ export const BgButton: FC<BgButtonProps> = ({
     {...props}
   />
 );
+
+export const TextButton: FC<BgButtonProps> = ({
+  color = "green",
+  className,
+  ...props
+}) => (
+  <button
+    className={`text-stone-500 hover:underline hover:text-${color}-500 active:text-${color}-600 ${className}`}
+    {...props}
+  />
+);

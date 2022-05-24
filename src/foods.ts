@@ -39,6 +39,7 @@ const proteins: Food[] = [
   { name: "lentils", protein: true, weight: 50 },
   { name: "pesto turkey burgers", protein: true, weight: 100 },
   { name: "chicken", protein: true, weight: 100 },
+  { name: "new seasons chicken kebab", protein: true, weight: 100 },
 ];
 
 const combos: Food[] = [

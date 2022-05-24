@@ -14,6 +14,10 @@ body {
   @apply mx-auto;
 }
 
+input {
+  outline: none;
+}
+
 /* Chrome, Safari, Edge, Opera -- hide arrow buttons on number input type*/
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
