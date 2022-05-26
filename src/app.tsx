@@ -4,32 +4,32 @@ import { FoodList } from "./food-list";
 import { useState } from "react";
 import { PillBox } from "./components/pills";
 
-type Screen = "foodList" | "generator";
-
-const getScreen = (screen: Screen) => {
-  switch (screen) {
-    case "foodList":
-      return <FoodList />;
-    default:
-      return null;
-  }
-};
-
 const App = () => {
-  const [screen, setScreen] = useState<Screen>("generator");
-
-  const visibleScreen = getScreen(screen);
+  const [showMealGenerator, setShowMealGenerator] = useState(true);
 
   return (
     <>
-      {/* <div className="mb-8 text-sm text-stone-500 hover:children:text-stone-900"> */}
-      <PillBox>
-        <button onClick={() => setScreen("generator")} className="mr-5">Meal Generator</button>
-        <button onClick={() => setScreen("foodList")}>Food List</button>
+      <PillBox className="mb-7">
+        <button
+          onClick={() => setShowMealGenerator(true)}
+          className={showMealGenerator ? "pointer-events-none" : "bg-stone-100"}
+        >
+          Meal Generator
+        </button>
+        <button
+          onClick={() => setShowMealGenerator(false)}
+          className={
+            !showMealGenerator ? "pointer-events-none" : "bg-stone-100"
+          }
+        >
+          Food List
+        </button>
       </PillBox>
       {/* Never unmount MealPlanGenerator so that we don't lose its state */}
-      <div style={{ display: visibleScreen ? "none" : "block" }}><MealPlanGenerator /></div>
-      {visibleScreen}
+      <div style={{ display: showMealGenerator ? "block" : "none" }}>
+        <MealPlanGenerator />
+      </div>
+      {!showMealGenerator && <FoodList />}
     </>
   );
 };
