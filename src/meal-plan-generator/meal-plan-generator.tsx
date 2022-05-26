@@ -102,6 +102,7 @@ const getNewValue = <V extends unknown>(arr: V[], val: V) => {
 };
 
 const refreshButtonClassName = "invisible group-hover:visible mr-1 -ml-5";
+const trClassName = "children:py-6 children:px-7";
 
 export const MealPlanGenerator = () => {
   const [reRenderCount, reRender] = useState(0);
@@ -140,7 +141,7 @@ export const MealPlanGenerator = () => {
           <input
             {...register("days")}
             type="number"
-            className="text-center text-7xl font-semibold w-32 p-2 border-2 border-stone-200 focus:border-blue-500"
+            className="text-center shadow-2xl text-7xl font-semibold w-32 p-2 border-2 border-stone-200 focus:border-blue-500"
             autoFocus
           />
           <TextButton
@@ -151,54 +152,56 @@ export const MealPlanGenerator = () => {
           </TextButton>
         </div>
       </form>
-      <table cellSpacing="0" cellPadding="0">
-        <thead className="bg-stone-100">
-          <tr className="children:p-1">
-            <th className="w-1/2">Protein</th>
-            <th className="w-1/4">Carb</th>
-            <th>Veggie</th>
-          </tr>
-        </thead>
-        <tbody className="cursor-pointer">
-          {meals.map((meal, i) => (
-            <tr
-              key={i}
-              onClick={() => togglePin(meal)}
-              className={`children:p-1 group ${
-                pinned.includes(meal) ? "bg-yellow-100" : "hover:bg-yellow-50"
-              }`}
-            >
-              <td>{titleCase(meal.protein.name)}</td>
-              <td>
-                {meal.carbs && (
-                  <>
-                    <button
-                      className={refreshButtonClassName}
-                      onClick={shuffleFood("carbs", i)}
-                    >
-                      🔄
-                    </button>
-                    {titleCase(meal.carbs.name)}
-                  </>
-                )}
-              </td>
-              <td>
-                {meal.veggies && (
-                  <>
-                    <button
-                      className={refreshButtonClassName}
-                      onClick={shuffleFood("veggies", i)}
-                    >
-                      🔄
-                    </button>
-                    {titleCase(meal.veggies.name)}
-                  </>
-                )}
-              </td>
+      <div className="bg-white shadow-2xl border border-stone-200 overflow-hidden rounded-xl">
+        <table>
+          <thead className="">
+            <tr className={`${trClassName} bg-stone-100 `}>
+              <th className="w-1/2">Protein</th>
+              <th className="w-1/4">Carb</th>
+              <th>Veggie</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="cursor-pointer">
+            {meals.map((meal, i) => (
+              <tr
+                key={i}
+                onClick={() => togglePin(meal)}
+                className={`${trClassName} border-t border-stone-200 group ${
+                  pinned.includes(meal) ? "bg-yellow-100" : "hover:bg-yellow-50"
+                }`}
+              >
+                <td>{titleCase(meal.protein.name)}</td>
+                <td>
+                  {meal.carbs && (
+                    <>
+                      <button
+                        className={refreshButtonClassName}
+                        onClick={shuffleFood("carbs", i)}
+                      >
+                        🔄
+                      </button>
+                      {titleCase(meal.carbs.name)}
+                    </>
+                  )}
+                </td>
+                <td>
+                  {meal.veggies && (
+                    <>
+                      <button
+                        className={refreshButtonClassName}
+                        onClick={shuffleFood("veggies", i)}
+                      >
+                        🔄
+                      </button>
+                      {titleCase(meal.veggies.name)}
+                    </>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       <div className="text-center">
         <TextButton className="mt-4" onClick={copyMeals(meals)} color="blue">
           Copy results

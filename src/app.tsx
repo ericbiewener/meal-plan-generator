@@ -2,6 +2,7 @@ import { MealPlanGenerator } from "./meal-plan-generator/meal-plan-generator";
 import { createRoot } from "react-dom/client";
 import { FoodList } from "./food-list";
 import { useState } from "react";
+import { PillBox } from "./components/pills";
 
 type Screen = "foodList" | "generator";
 
@@ -21,10 +22,11 @@ const App = () => {
 
   return (
     <>
-      <div className="mb-8 text-sm text-stone-500 hover:children:text-stone-900">
+      {/* <div className="mb-8 text-sm text-stone-500 hover:children:text-stone-900"> */}
+      <PillBox>
         <button onClick={() => setScreen("generator")} className="mr-5">Meal Generator</button>
         <button onClick={() => setScreen("foodList")}>Food List</button>
-      </div>
+      </PillBox>
       {/* Never unmount MealPlanGenerator so that we don't lose its state */}
       <div style={{ display: visibleScreen ? "none" : "block" }}><MealPlanGenerator /></div>
       {visibleScreen}

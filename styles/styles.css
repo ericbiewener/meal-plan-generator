@@ -10,6 +10,7 @@ body {
   @apply text-stone-900;
   @apply my-14;
   @apply mx-auto;
+  @apply bg-stone-100;
 }
 
 input {
