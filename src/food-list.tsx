@@ -1,6 +1,7 @@
 import { Food } from "./foods";
 import { FC } from "react";
 import { getFoodsByType } from "./foods";
+import { classes } from "./components/classes";
 
 const { proteins, veggies, carbs } = getFoodsByType();
 
@@ -18,12 +19,14 @@ const List: FC<ListProps> = ({ title, data }) => (
 );
 
 export const FoodList = () => (
-  <div id="food-list">
-    <h1>Food List</h1>
-    <div className="flex justify-between">
-      <List title="Protein" data={proteins} />
-      <List title="Veggies" data={veggies} />
-      <List title="Carbs" data={carbs} />
+  <div>
+    <h1 className={classes.card.header}>Food List</h1>
+    <div
+      className={`flex justify-between ${classes.card.padding} ${classes.card.main}`}
+    >
+      <List title="Protein 🍖" data={proteins} />
+      <List title="Veggies 🥦" data={veggies} />
+      <List title="Carbs 🍞" data={carbs} />
     </div>
   </div>
 );

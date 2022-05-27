@@ -12,82 +12,15 @@ import {
   SetStateAction,
 } from "react";
 import copy from "copy-to-clipboard";
-import {
-  OutlineButton,
-  BgButton,
-  TextButton,
-  Button,
-} from "../components/button";
+import { Button } from "../components/button";
+import { classes } from "../components/classes";
+import { IoShuffle } from "react-icons/io5";
+import { useFlashNotificationCtx } from "../flash-notifications/flash-notification-provider";
+import { preventDefault } from "../utils";
+import { Meal, createMeals } from "./create-meals";
+import { usePinned } from "./use-pinned";
 
-type Meal = {
-  protein: Food;
-  carbs?: Food;
-  veggies?: Food;
-};
-
-const preventDefault = (e: SyntheticEvent) => e.preventDefault();
-
-const createMeals = (quantity: number, pinnedMeals: Meal[] = []) => {
-  const meals = [...pinnedMeals];
-  const remaining = quantity - meals.length;
-
-  const foods = getFoodsByType();
-  const proteins = _.shuffle(foods.proteins).filter(
-    (p) => !meals.some((m) => m.protein.name === p.name)
-  );
-  const carbs = _.shuffle(foods.carbs);
-  const veggies = _.shuffle(foods.veggies);
-
-  for (let i = 0; i < remaining; i++) {
-    const protein = proteins.pop();
-    if (!protein) break;
-
-    const meal: Meal = { protein };
-    if (protein.sides) {
-      protein.sides.forEach((side) => {
-        if (side.veggies) {
-          meal.veggies = side;
-        } else if (side.carbs) {
-          meal.carbs = side;
-        }
-      });
-    }
-
-    if (!meal.carbs && !meal.veggies?.carbs && !protein.carbs)
-      meal.carbs = carbs.pop();
-    if (!meal.veggies && !meal.carbs?.veggies && !protein.veggies)
-      meal.veggies = veggies.pop();
-    meals.push(meal);
-  }
-
-  return meals;
-};
-
-const usePinned = (setMeals: Dispatch<SetStateAction<Meal[]>>) => {
-  const [pinned, setPinned] = useState<Meal[]>([]);
-
-  const togglePin = (...meals: Meal[]) => {
-    const newPinned = [...pinned];
-    for (const meal of meals) {
-      const idx = pinned.indexOf(meal);
-      if (idx < 0) {
-        newPinned.push(meal);
-      } else {
-        newPinned.splice(idx, 1);
-      }
-    }
-    setPinned(newPinned);
-    console.info("::", newPinned);
-    setMeals((allMeals) => [
-      ...newPinned,
-      ...allMeals.filter((m) => !newPinned.includes(m)),
-    ]);
-  };
-
-  return { pinned, togglePin };
-};
-
-const copyMeals = (meals: Meal[]) => () => {
+const copyMeals = (meals: Meal[]) => {
   copy(
     meals
       .map((m) =>
@@ -106,13 +39,16 @@ const getNewValue = <V extends unknown>(arr: V[], val: V) => {
   }
 };
 
-const refreshButtonClassName = "invisible group-hover:visible mr-1 -ml-5";
+const refreshButtonClassName =
+  "invisible group-hover:visible -ml-5 text-stone-500 hover:text-stone-400 active:text-stone-500";
 const trClassName = "children:py-5 children:px-6";
 
 export const MealPlanGenerator = () => {
   const [reRenderCount, reRender] = useState(0);
   const { register, watch } = useForm({ defaultValues: { days: 10 } });
   const days = watch("days");
+
+  const { showFlashNotification } = useFlashNotificationCtx();
 
   const [meals, setMeals] = useState(() => createMeals(days));
   const { pinned, togglePin } = usePinned(setMeals);
@@ -158,7 +94,9 @@ export const MealPlanGenerator = () => {
           </Button>
         </div>
       </form>
-      <div className="bg-white shadow-2xl border border-stone-200 overflow-hidden rounded-xl">
+      <div
+        className={`${classes.card.main} border border-stone-200 overflow-hidden`}
+      >
         <table>
           <thead className="">
             <tr className={`${trClassName} bg-stone-100 `}>
@@ -184,8 +122,8 @@ export const MealPlanGenerator = () => {
                         className={refreshButtonClassName}
                         onClick={shuffleFood("carbs", i)}
                       >
-                        🔄
-                      </button>
+                        <IoShuffle />
+                      </button>{" "}
                       {titleCase(meal.carbs.name)}
                     </>
                   )}
@@ -197,8 +135,8 @@ export const MealPlanGenerator = () => {
                         className={refreshButtonClassName}
                         onClick={shuffleFood("veggies", i)}
                       >
-                        🔄
-                      </button>
+                        <IoShuffle />
+                      </button>{" "}
                       {titleCase(meal.veggies.name)}
                     </>
                   )}
@@ -209,7 +147,14 @@ export const MealPlanGenerator = () => {
           <tfoot>
             <tr className={`border-stone-200 border-t ${trClassName}`}>
               <td colSpan={3} className="text-center">
-                <Button onClick={copyMeals(meals)}>Copy results</Button>
+                <Button
+                  onClick={() => {
+                    copyMeals(meals);
+                    showFlashNotification('Copied!')
+                  }}
+                >
+                  Copy results
+                </Button>
               </td>
             </tr>
           </tfoot>
