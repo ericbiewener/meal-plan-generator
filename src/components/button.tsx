@@ -31,3 +31,16 @@ export const TextButton: FC<BgButtonProps> = ({
     {...props}
   />
 );
+
+type ButtonProps = HTMLAttributes<HTMLButtonElement> & { type?: 1 | 2 };
+
+export const Button: FC<ButtonProps> = ({ type = 2, className, ...props }) => {
+  const colorClassNames = type === 1 ? "bg-green-500 hover:bg-green-400 active:bg-green-500" : "bg-gray-500 hover:bg-gray-400 active:bg-gray-500";
+
+  return (
+    <button
+      className={`${colorClassNames} rounded-md px-3 py-2 shadow-xl text-white ${className}`}
+      {...props}
+    />
+  );
+};

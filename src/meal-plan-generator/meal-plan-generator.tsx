@@ -12,7 +12,12 @@ import {
   SetStateAction,
 } from "react";
 import copy from "copy-to-clipboard";
-import { OutlineButton, BgButton, TextButton } from "../components/button";
+import {
+  OutlineButton,
+  BgButton,
+  TextButton,
+  Button,
+} from "../components/button";
 
 type Meal = {
   protein: Food;
@@ -102,7 +107,7 @@ const getNewValue = <V extends unknown>(arr: V[], val: V) => {
 };
 
 const refreshButtonClassName = "invisible group-hover:visible mr-1 -ml-5";
-const trClassName = "children:py-6 children:px-7";
+const trClassName = "children:py-5 children:px-6";
 
 export const MealPlanGenerator = () => {
   const [reRenderCount, reRender] = useState(0);
@@ -144,12 +149,13 @@ export const MealPlanGenerator = () => {
             className="text-center shadow-2xl text-7xl font-semibold w-32 p-2 border-2 border-stone-200 focus:border-blue-500"
             autoFocus
           />
-          <TextButton
+          <Button
             onClick={() => reRender((v) => v + 1)}
             className="mt-4 mb-8"
+            type={1}
           >
             Shuffle
-          </TextButton>
+          </Button>
         </div>
       </form>
       <div className="bg-white shadow-2xl border border-stone-200 overflow-hidden rounded-xl">
@@ -200,12 +206,14 @@ export const MealPlanGenerator = () => {
               </tr>
             ))}
           </tbody>
+          <tfoot>
+            <tr className={`border-stone-200 border-t ${trClassName}`}>
+              <td colSpan={3} className="text-center">
+                <Button onClick={copyMeals(meals)}>Copy results</Button>
+              </td>
+            </tr>
+          </tfoot>
         </table>
-      </div>
-      <div className="text-center">
-        <TextButton className="mt-4" onClick={copyMeals(meals)} color="blue">
-          Copy results
-        </TextButton>
       </div>
     </>
   );
