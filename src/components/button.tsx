@@ -39,7 +39,7 @@ export const Button: FC<ButtonProps> = ({ type = 2, className, ...props }) => {
 
   return (
     <button
-      className={`${colorClassNames} rounded-md px-3 py-2 shadow-xl text-white ${className}`}
+      className={`${colorClassNames} rounded-full px-3 py-2 shadow-xl text-white ${className}`}
       {...props}
     />
   );
