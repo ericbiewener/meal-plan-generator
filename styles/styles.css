@@ -41,29 +41,34 @@ h2 {
   @apply mb-4;
 }
 
-.fade-pop-appear,
-.fade-pop-enter {
-  animation: fade-pop 150ms ease-in forwards;
+
+/*
+ * ANIMATIONS
+*/
+
+.animation-duration-150 {
+  animation-duration: 150ms;
 }
 
-.fade-pop-leave {
-  @apply fade-pop-enter;
-  animation-direction: backwards;
+.fade-zoom-enter {
+  animation-name: fade-zoom;
+  animation-timing-function: ease-in;
+  animation-fill-mode: forwards;
 }
 
+.fade-zoom-exit {
+  @apply fade-zoom-enter;
+  animation-direction: reverse;
+}
 
-@keyframes fade-pop {
+@keyframes fade-zoom {
   0% {
     opacity: 0;
     transform: scale(0.75);
   }
 
-  90% {
-    opacity: 1;
-    transform: scale(1.1);
-  }
-
   100% {
+    opacity: 1;
     transform: scale(1);
   }
 }

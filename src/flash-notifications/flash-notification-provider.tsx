@@ -6,7 +6,7 @@ import {
   useState,
   useCallback,
 } from "react";
-import {CSSTransition} from "react-transition-group";
+import {CSSTransition, TransitionGroup} from "react-transition-group";
 
 export type FlashNotificationCtxType = {
   showFlashNotification: (content: ReactNode) => void;
@@ -17,6 +17,8 @@ export const FlashNotificationCtx = createContext<FlashNotificationCtxType>(
 );
 export const useFlashNotificationCtx = () =>
   useContext<FlashNotificationCtxType>(FlashNotificationCtx);
+
+const ANIMATION_DURATION = 150;
 
 export const FlashNotificationProvider: FC<{ children: ReactNode }> = ({
   children,
@@ -36,21 +38,19 @@ export const FlashNotificationProvider: FC<{ children: ReactNode }> = ({
   return (
     <FlashNotificationCtx.Provider value={{ showFlashNotification }}>
       {children}
-      <div className="fixed bottom-4 right-4">
+      <TransitionGroup className="fixed bottom-4 right-4">
         {state.map((s, i) => (
           <CSSTransition
             key={i}
-            in
-            appear
-            timeout={3000}
-            classNames="fade-pop"
+            timeout={ANIMATION_DURATION}
+            classNames="fade-zoom"
           >
-            <div className="not-last:mb-2 px-3 py-2 rounded-md shadow-xl w-80 bg-emerald-100 border border-emerald-200">
+            <div className={`animation-duration-${ANIMATION_DURATION} not-last:mb-2 px-3 py-2 rounded-md shadow-xl w-80 bg-emerald-100 border border-emerald-200`}>
               {s}
             </div>
           </CSSTransition>
         ))}
-      </div>
+      </TransitionGroup>
     </FlashNotificationCtx.Provider>
   );
 };
