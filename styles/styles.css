@@ -40,3 +40,30 @@ h2 {
   @apply font-semibold;
   @apply mb-4;
 }
+
+.fade-pop-appear,
+.fade-pop-enter {
+  animation: fade-pop 150ms ease-in forwards;
+}
+
+.fade-pop-leave {
+  @apply fade-pop-enter;
+  animation-direction: backwards;
+}
+
+
+@keyframes fade-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.75);
+  }
+
+  90% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}

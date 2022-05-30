@@ -6,6 +6,7 @@ import {
   useState,
   useCallback,
 } from "react";
+import {CSSTransition} from "react-transition-group";
 
 export type FlashNotificationCtxType = {
   showFlashNotification: (content: ReactNode) => void;
@@ -37,9 +38,17 @@ export const FlashNotificationProvider: FC<{ children: ReactNode }> = ({
       {children}
       <div className="fixed bottom-4 right-4">
         {state.map((s, i) => (
-          <div key={i} className="not-last:mb-2 px-3 py-2 rounded-md shadow-xl w-80 bg-emerald-100 border border-emerald-200">
-            {s}
-          </div>
+          <CSSTransition
+            key={i}
+            in
+            appear
+            timeout={3000}
+            classNames="fade-pop"
+          >
+            <div className="not-last:mb-2 px-3 py-2 rounded-md shadow-xl w-80 bg-emerald-100 border border-emerald-200">
+              {s}
+            </div>
+          </CSSTransition>
         ))}
       </div>
     </FlashNotificationCtx.Provider>
